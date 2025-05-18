@@ -1,0 +1,40 @@
+syntax = "proto3";
+package transport;
+
+// Transport Service definition
+service TransportService {
+  // Get the location of a vehicle
+  rpc GetVehicleLocation (VehicleRequest) returns (LocationResponse);
+  
+  // Update the location of a vehicle
+  rpc UpdateVehicleLocation (LocationUpdate) returns (OperationResponse);
+}
+
+// Request message for vehicle information
+message VehicleRequest {
+  string vehicle_id = 1;
+}
+
+// Response message with vehicle location
+message LocationResponse {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string next_stop = 4;
+  int32 eta_minutes = 5;
+}
+
+// Request message for updating vehicle location
+message LocationUpdate {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string next_stop = 4;
+  int32 eta_minutes = 5;
+}
+
+// Response message for operation result
+message OperationResponse {
+  bool success = 1;
+  string message = 2;
+}

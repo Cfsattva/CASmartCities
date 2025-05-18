@@ -1,0 +1,36 @@
+syntax = "proto3";
+package parking;
+
+// Parking Service definition
+service ParkingService {
+  // Get available spaces in a parking lot
+  rpc GetAvailableSpaces (ParkingLotRequest) returns (AvailabilityResponse);
+  
+  // Reserve a parking space
+  rpc ReserveSpace (ReservationRequest) returns (ReservationResponse);
+}
+
+// Request message for getting parking availability
+message ParkingLotRequest {
+  string lot_id = 1;
+}
+
+// Response message with availability information
+message AvailabilityResponse {
+  string lot_id = 1;
+  int32 total_spaces = 2;
+  int32 available_spaces = 3;
+}
+
+// Request message for reserving a space
+message ReservationRequest {
+  string lot_id = 1;
+  string vehicle_id = 2;
+}
+
+// Response message for reservation result
+message ReservationResponse {
+  bool success = 1;
+  string reservation_id = 2;
+  string message = 3;
+}

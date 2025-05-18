@@ -1,0 +1,34 @@
+syntax = "proto3";
+package trafficlight;
+
+// Traffic Light Service definition
+service TrafficLightService {
+  // Get status of a traffic light
+  rpc GetLightStatus (LightRequest) returns (LightStatus);
+  
+  // Change color of a traffic light
+  rpc ChangeLight (ChangeRequest) returns (OperationResponse);
+}
+
+// Request message for getting light status
+message LightRequest {
+  string light_id = 1;
+}
+
+// Response message with light status
+message LightStatus {
+  string light_id = 1;
+  string color = 2;
+}
+
+// Request message for changing light
+message ChangeRequest {
+  string light_id = 1;
+  string color = 2;
+}
+
+// Response message for operation result
+message OperationResponse {
+  bool success = 1;
+  string message = 2;
+}

@@ -1,0 +1,56 @@
+syntax = "proto3";
+package transport;
+
+// Transport Service definition
+service TransportService {
+  // Get the current location of a specific vehicle
+  rpc GetVehicleLocation (VehicleRequest) returns (LocationResponse);
+  
+  // Track a vehicle's movement in real-time (server streaming)
+  rpc TrackVehicle (VehicleRequest) returns (stream LocationUpdate);
+  
+  // Allow vehicles to report their positions (client streaming)
+  rpc ReportVehiclePositions (stream PositionReport) returns (ReportResponse);
+}
+
+// Request message for vehicle information
+message VehicleRequest {
+  string vehicle_id = 1;  // Identifier for the transit vehicle
+}
+
+// Response message with vehicle location
+message LocationResponse {
+  string vehicle_id = 1;    // Echo of the requested vehicle ID
+  double latitude = 2;      // Current latitude coordinate
+  double longitude = 3;     // Current longitude coordinate
+  string route_id = 4;      // Identifier for the current route
+  string next_stop = 5;     // Name of the upcoming stop
+  int32 eta_seconds = 6;    // Estimated time to next stop in seconds
+}
+
+// Location update message (for streaming)
+message LocationUpdate {
+  string vehicle_id = 1;    // Vehicle identifier
+  double latitude = 2;      // Current latitude
+  double longitude = 3;     // Current longitude
+  string timestamp = 4;     // Time of location update
+  int32 speed = 5;          // Current speed in km/h
+  string next_stop = 6;     // Next stop name
+  int32 eta_seconds = 7;    // Updated ETA to next stop
+}
+
+// Position report message from vehicle
+message PositionReport {
+  string vehicle_id = 1;   // Vehicle identifier
+  double latitude = 2;     // Current latitude
+  double longitude = 3;    // Current longitude
+  int32 speed = 4;         // Current speed in km/h
+  string timestamp = 5;    // Time of position capture
+}
+
+// Response after receiving position reports
+message ReportResponse {
+  bool success = 1;              // Whether updates were processed successfully
+  int32 updates_processed = 2;   // Number of position updates received
+  string message = 3;            // Status message
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Smart City Controller</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .item {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f5f5f5;
+      }
+      button {
+        padding: 5px 10px;
+        margin: 5px;
+        cursor: pointer;
+      }
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+      }
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+      }
+      .tab button:hover {
+        background-color: #ddd;
+      }
+      .tab button.active {
+        background-color: #ccc;
+      }
+      .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Smart City Controller</h1>
+
+    <div class="tab">
+      <button
+        class="tablinks"
+        onclick="openTab(event, 'TrafficTab')"
+        id="defaultOpen"
+      >
+        Traffic Lights
+      </button>
+      <button class="tablinks" onclick="openTab(event, 'ParkingTab')">
+        Parking
+      </button>
+      <button class="tablinks" onclick="openTab(event, 'TransportTab')">
+        Transport
+      </button>
+    </div>
+
+    <!-- Traffic Tab -->
+    <div id="TrafficTab" class="tabcontent">
+      <h2>Traffic Light Management</h2>
+      <div id="trafficLights" class="section">
+        <p>Loading traffic lights...</p>
+      </div>
+
+      <h3>Change Light Color</h3>
+      <div class="section">
+        <form id="changeLightForm">
+          <label for="lightId">Light ID:</label>
+          <input type="text" id="lightId" name="lightId" required /><br /><br />
+
+          <label for="lightColor">New Color:</label>
+          <select id="lightColor" name="color" required>
+            <option value="red">Red</option>
+            <option value="yellow">Yellow</option>
+            <option value="green">Green</option></select
+          ><br /><br />
+
+          <button type="submit">Change Light</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Parking Tab -->
+    <div id="ParkingTab" class="tabcontent">
+      <h2>Parking Management</h2>
+      <div id="parkingLots" class="section">
+        <p>Loading parking lots...</p>
+      </div>
+
+      <h3>Reserve Parking Space</h3>
+      <div class="section">
+        <form id="reserveSpaceForm">
+          <label for="lotId">Lot ID:</label>
+          <input type="text" id="lotId" name="lotId" required /><br /><br />
+
+          <label for="vehicleId">Vehicle ID:</label>
+          <input
+            type="text"
+            id="vehicleId"
+            name="vehicleId"
+            required
+          /><br /><br />
+
+          <button type="submit">Reserve Space</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Transport Tab -->
+    <div id="TransportTab" class="tabcontent">
+      <h2>Public Transport Tracking</h2>
+      <div id="vehicles" class="section">
+        <p>Loading vehicles...</p>
+      </div>
+
+      <h3>Track Vehicle</h3>
+      <div class="section">
+        <form id="trackVehicleForm">
+          <label for="trackVehicleId">Vehicle ID:</label>
+          <input
+            type="text"
+            id="trackVehicleId"
+            name="vehicleId"
+            required
+          /><br /><br />
+
+          <button type="submit">Track Vehicle</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Tab functionality
+      function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+
+        // Load content for the tab
+        if (tabName === "TrafficTab") {
+          loadTrafficLights();
+        } else if (tabName === "ParkingTab") {
+          loadParkingLots();
+        } else if (tabName === "TransportTab") {
+          loadVehicles();
+        }
+      }
+
+      // Load traffic lights
+      function loadTrafficLights() {
+        fetch("/api/traffic/lights")
+          .then((response) => response.json())
+          .then((data) => {
+            const container = document.getElementById("trafficLights");
+            container.innerHTML = "";
+
+            data.forEach((light) => {
+              const div = document.createElement("div");
+              div.className = "item";
+              div.innerHTML = `
+              <h3>Light ID: ${light.id}</h3>
+              <p>Current Color: ${light.color}</p>
+            `;
+              container.appendChild(div);
+            });
+          })
+          .catch((error) => {
+            document.getElementById("trafficLights").innerHTML =
+              "<p>Error loading traffic lights: " + error.message + "</p>";
+          });
+      }
+
+      // Load parking lots
+      function loadParkingLots() {
+        fetch("/api/parking/lots")
+          .then((response) => response.json())
+          .then((data) => {
+            const container = document.getElementById("parkingLots");
+            container.innerHTML = "";
+
+            data.forEach((lot) => {
+              const div = document.createElement("div");
+              div.className = "item";
+              div.innerHTML = `
+              <h3>Lot ID: ${lot.id}</h3>
+              <p>Name: ${lot.name}</p>
+              <p>Available Spaces: ${lot.availableSpaces} / ${lot.totalSpaces}</p>
+            `;
+              container.appendChild(div);
+            });
+          })
+          .catch((error) => {
+            document.getElementById("parkingLots").innerHTML =
+              "<p>Error loading parking lots: " + error.message + "</p>";
+          });
+      }
+
+      // Load vehicles
+      function loadVehicles() {
+        fetch("/api/transport/vehicles")
+          .then((response) => response.json())
+          .then((data) => {
+            const container = document.getElementById("vehicles");
+            container.innerHTML = "";
+
+            data.forEach((vehicle) => {
+              const div = document.createElement("div");
+              div.className = "item";
+              div.innerHTML = `
+              <h3>Vehicle ID: ${vehicle.id}</h3>
+              <p>Type: ${vehicle.type}</p>
+              <p>Next Stop: ${vehicle.nextStop}</p>
+            `;
+              container.appendChild(div);
+            });
+          })
+          .catch((error) => {
+            document.getElementById("vehicles").innerHTML =
+              "<p>Error loading vehicles: " + error.message + "</p>";
+          });
+      }
+
+      // Handle form submissions
+      document
+        .getElementById("changeLightForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const lightId = document.getElementById("lightId").value;
+          const color = document.getElementById("lightColor").value;
+
+          fetch("/api/traffic/lights/" + lightId + "/change", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ color: color }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert("Light changed successfully: " + data.message);
+                loadTrafficLights();
+              } else {
+                alert("Error: " + data.message);
+              }
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+            });
+        });
+
+      document
+        .getElementById("reserveSpaceForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const lotId = document.getElementById("lotId").value;
+          const vehicleId = document.getElementById("vehicleId").value;
+
+          fetch("/api/parking/lots/" + lotId + "/reserve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vehicleId: vehicleId }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert(
+                  "Space reserved successfully. Reservation ID: " +
+                    data.reservationId
+                );
+                loadParkingLots();
+              } else {
+                alert("Error: " + data.message);
+              }
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+            });
+        });
+
+      document
+        .getElementById("trackVehicleForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const vehicleId = document.getElementById("trackVehicleId").value;
+          console.log("About to fetch vehicle with ID:", vehicleId);
+
+          if (!vehicleId || vehicleId.trim() === "") {
+            alert("Please enter a valid vehicle ID");
+            return; // Stop execution if no valid ID
+          }
+
+          fetch("/api/transport/vehicles/" + vehicleId)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.id) {
+                alert(
+                  `Vehicle ${data.id} Location:\nLatitude: ${data.latitude}\nLongitude: ${data.longitude}\nNext Stop: ${data.nextStop}\nETA: ${data.etaMinutes} minutes`
+                );
+              } else {
+                alert("Error: " + data.message);
+              }
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+            });
+        });
+
+      // Open default tab on page load
+      document.getElementById("defaultOpen").click();
+    </script>
+  </body>
+</html>

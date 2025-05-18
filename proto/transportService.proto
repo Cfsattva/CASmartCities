@@ -1,0 +1,50 @@
+syntax = "proto3";
+package transport;
+
+service TransportService {
+  // Unary RPC
+  rpc GetVehicleLocation (VehicleRequest) returns (LocationResponse);
+  
+  // Server streaming RPC
+  rpc TrackVehicle (VehicleRequest) returns (stream LocationUpdate);
+  
+  // Client streaming RPC
+  rpc ReportVehiclePositions (stream PositionReport) returns (ReportResponse);
+}
+
+message VehicleRequest {
+  string vehicle_id = 1;
+}
+
+message LocationResponse {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string route_id = 4;
+  string next_stop = 5;
+  int32 eta_seconds = 6;
+}
+
+message LocationUpdate {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string timestamp = 4;
+  int32 speed = 5;
+  string next_stop = 6;
+  int32 eta_seconds = 7;
+}
+
+message PositionReport {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  int32 speed = 4;
+  string timestamp = 5;
+}
+
+message ReportResponse {
+  bool success = 1;
+  int32 updates_processed = 2;
+  string message = 3;
+}

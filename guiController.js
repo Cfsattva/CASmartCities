@@ -3,7 +3,7 @@
  *
  * Provides a simple web interface to interact with all three services:
  * Traffic Light, Parking, and Transport.
- * Based on the examples from "RESTFUL API LAB DEMONSTRATION.pdf"
+ * Based on the examples from RESTFUL API LAB DEMONSTRATION class material
  */
 
 const express = require("express");
